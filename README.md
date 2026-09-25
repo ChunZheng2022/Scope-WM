@@ -179,6 +179,3 @@ Scope-WM builds on and is inspired by several excellent projects and papers:
 - [DINO-WM](https://github.com/gaoyuezhou/dino_wm)
 - [DDP-WM](https://github.com/HCPLab-SYSU/DDP-WM)
 - [DINOv2](https://github.com/facebookresearch/dinov2)
-
-Please also see `THIRD_PARTY_NOTICES.md` for third-party components retained in
-this codebase.
