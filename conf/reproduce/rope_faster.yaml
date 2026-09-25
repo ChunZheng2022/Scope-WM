@@ -1,0 +1,68 @@
+# Scope-WM rope faster resolved reproduction record.
+# This file records the final experiment parameters; commands in README.md show
+# how to pass the same values to train.py and plan.py.
+
+task: rope
+variant: faster
+paths:
+  data_root: /path/to/data
+  checkpoint_root: /path/to/checkpoints
+  output_root: /path/to/outputs
+  drs_head: /path/to/drs_outputs/rope_drs_head_gradxinput_b400.pt
+  dinov2_local_path: /path/to/dinov2
+training:
+  env: deformable_env
+  env_kwargs_object_name: rope
+  env_dataset_object_name: rope
+  frameskip: 1
+  num_hist: 1
+  epochs: 100
+  training_gpus: 1 x NVIDIA RTX 2080 Ti
+  global_batch_size: 64
+  per_gpu_batch_size: 64
+  predictor_lr: 1.0e-4
+  action_encoder_lr: 1.0e-4
+  decoder_enabled: false
+  use_drs: true
+  drs_mode: distilled_topk
+  drs_topk: 32
+  drs_mask_type: mask
+  drs_frozen: true
+  sparse_dynamics_enabled: true
+  sparse_dynamics_mode: sparse_primary
+  sparse_mask_source: drs
+  background_processor: fdbu
+  fdbu_hidden_mult: 2.0
+  fdbu_alpha: 1.0
+  fdbu_dropout: 0.0
+  loss_on_foreground_only: false
+planning:
+  plan_config: plan.yaml planner=mpc_cem
+  n_evals: 10
+  goal_H: 5
+  objective_alpha: 1
+  objective_mode: last
+  max_mpc_steps: 7
+  plan_active_only: true
+  load_decoder: false
+  wandb_logging: false
+  eb_cem_enabled: true
+  initial_population: 300
+  initial_elites: 30
+  later_population: 100
+  later_elites: 10
+  elite_bank_size: 30
+  local_fraction: 0.7
+  global_fraction: 0.3
+  perturbation_scale: 0.5
+  bank_save_mpc_step: 0
+  bank_use_start_step: 1
+  bank_update_mode: initial_only
+  eb_cem_shift_steps: 0
+  elite_bank_shift_steps: 0
+seeds:
+  world_model_training_seed: 0
+  trajectory_split_seed: 42
+  planning_seed: 99
+  eval_seed_formula: s_i = 99 * i + 1
+metric: chamfer_distance

@@ -1,0 +1,133 @@
+defaults:
+  - _self_
+  - planner: gd
+  - override hydra/launcher: submitit_slurm
+
+hydra:
+  run:
+    dir: plan_outputs/${now:%Y%m%d%H%M%S}_${replace_slash:${model_name}}_gH${goal_H}
+  sweep:
+    dir: plan_outputs/${now:%Y%m%d%H%M%S}_${replace_slash:${model_name}}_gH${goal_H}
+    subdir: ${hydra.job.num}
+  launcher:
+    submitit_folder: ${hydra.sweep.dir}/.submitit/%j
+    nodes: 1
+    tasks_per_node: 1
+    cpus_per_task: 16
+    mem_gb: 256
+    gres: "gpu:h100:1"
+    qos: "explore"
+    timeout_min: 720
+    setup: ["export DEBUGVAR=$(scontrol show hostnames $SLURM_JOB_NODELIST)",
+            export MASTER_ADDR="$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)",
+            "export MASTER_PORT=$(for port in $(shuf -i 30000-65500 -n 20); do if [[ $(netstat -tupln 2>&1 | grep $port | wc -l) -eq 0 ]] ; then echo $port; break; fi; done;)",]
+
+# model to load for planning
+ckpt_base_path: ./ # put absolute path here. Checkpoints will be loaded from ${ckpt_base_path}/outputs
+model_name: null
+model_epoch: latest
+load_decoder: true
+data_path: null # optional override for loaded model config env.dataset.data_path
+
+seed: 99
+n_evals: 10
+eval_seed_list: null
+dset_eval_offset: 0
+dset_eval_indices: null
+goal_source: 'dset' # 'random_state' or 'dset' or 'random_action' 
+goal_H: 5 # specifies how far away the goal is if goal_source is 'dset'
+n_plot_samples: 10
+
+debug_dset_init: False
+wandb_logging: false
+
+objective:
+  _target_: planning.objectives.create_objective_fn
+  alpha: 1
+  base: 2 # coeff base for weighting all frames. Only applies when mode == 'all'
+  mode: last
+
+use_drs: false
+drs_mode: "none"
+drs_keep_ratio: 1.0
+drs_topk: null
+drs_action_aware: true
+drs_mask_type: "mask" # mask, grouped, or prune
+drs_detach_score: true
+drs_debug: false
+drs_head_checkpoint: null
+drs_group_size: 2
+
+use_roi: false # legacy alias for use_drs
+roi_mode: "none"
+roi_keep_ratio: 1.0
+roi_topk: null
+roi_action_aware: true
+roi_mask_type: "mask" # mask, grouped, or prune
+roi_detach_score: true
+roi_debug: false
+roi_head_checkpoint: null
+roi_group_size: 2
+
+drs_distill:
+  enabled: false
+  teacher_checkpoint: null
+  target_path: null
+  output_dir: null
+  target_type: "grad_x_input"
+  loss_type: "kl"
+  temperature: 1.0
+  budget_loss_weight: 0.0
+  action_conditioned: true
+  freeze_world_model: true
+  train_roi_head_only: true
+
+roi_distill:
+  enabled: false
+  teacher_checkpoint: null
+  target_path: null
+  output_dir: null
+  target_type: "grad_x_input"
+  loss_type: "kl"
+  temperature: 1.0
+  budget_loss_weight: 0.0
+  action_conditioned: true
+  freeze_world_model: true
+  train_roi_head_only: true
+
+sparse_baseline:
+  enabled: false
+  modes: ["random", "fixed_random", "lhs", "attention_encoder", "attention_wm"]
+  drop_ratios: [0.1, 0.3, 0.5, 0.7, 0.9]
+  resample_each_mpc_iter: true
+  save_masks: false
+
+sparse_dynamics:
+  enabled: false
+  mode: "sparse_primary"
+  mask_source: "drs" # drs/roi, dynamic_localizer, drs_union_dynamic, or drs_intersect_dynamic
+  background_processor: "none" # none, ignore, grouped, ru, lrm, or fdbu
+  background_group_size: 2
+  foreground_keep_ratio: 1.0
+  foreground_topk: null
+  fill_mode: "carry_forward"
+  loss_on_foreground_only: true
+  ru_rank: 16
+  ru_alpha: 1.0
+  ru_dropout: 0.0
+  lrm_heads: 4
+  lrm_num_tokens: 196
+  lrm_alpha: 1.0
+  lrm_dropout: 0.0
+  lrm_rank: 16 # legacy alias for ru_rank
+  fdbu_hidden_dim: null
+  fdbu_hidden_mult: 2.0
+  fdbu_alpha: 1.0
+  fdbu_dropout: 0.0
+  cbu_hidden_dim: null # legacy alias for fdbu_hidden_dim
+  cbu_hidden_mult: 2.0 # legacy alias for fdbu_hidden_mult
+  cbu_alpha: 1.0 # legacy alias for fdbu_alpha
+  cbu_dropout: 0.0 # legacy alias for fdbu_dropout
+  dynamic_localizer_checkpoint: null
+  dynamic_localizer_threshold: 0.5
+  dynamic_localizer_min_tokens: 32

@@ -1,0 +1,54 @@
+_target_: planning.mpc.MPCPlanner
+max_iter: null # unlimited if null
+n_taken_actions: 5
+plan_active_only: false
+force_full_mpc_iters: false
+adaptive_cem_samples:
+  enabled: false
+  base_num_samples: null
+  base_topk: null
+  boost_num_samples: null
+  boost_topk: null
+  failure_patience: 2
+  boost_duration: 1
+  min_mpc_iter: 0
+frontloaded_cem_samples:
+  enabled: false
+  frontload_iters: 1
+  front_num_samples: null
+  front_topk: null
+  later_num_samples: null
+  later_topk: null
+sub_planner:
+  target: planning.cem.CEMPlanner
+  horizon: 5
+  topk: 30
+  num_samples: 300
+  var_scale: 1
+  opt_steps: 30
+  eval_every: 1
+  diagnose_candidate_env: false
+  diagnose_candidate_topk: 10
+  diagnose_candidate_random: 0
+  diagnose_candidate_eval_indices: null
+  diagnose_candidate_mpc_iters: null
+  diagnose_candidate_cem_iters: null
+  diagnose_candidate_filename: candidate_env_diagnostics.jsonl
+  eb_cem_enabled: false
+  eb_cem_save_mpc_iter: 0
+  eb_cem_use_start_mpc_iter: 1
+  eb_cem_topm: 30
+  eb_cem_sample_fraction: 0.7
+  eb_cem_noise_scale: 0.5
+  eb_cem_shift_steps: 0
+  eb_cem_update_mode: initial_only
+  elite_bank_enabled: false # legacy alias for eb_cem_enabled
+  elite_bank_save_mpc_iter: 0 # legacy alias for eb_cem_save_mpc_iter
+  elite_bank_use_start_mpc_iter: 1 # legacy alias for eb_cem_use_start_mpc_iter
+  elite_bank_topm: 30 # legacy alias for eb_cem_topm
+  elite_bank_sample_fraction: 0.7 # legacy alias for eb_cem_sample_fraction
+  elite_bank_noise_scale: 0.5 # legacy alias for eb_cem_noise_scale
+  elite_bank_shift_steps: 0 # legacy alias for eb_cem_shift_steps
+  elite_bank_update_mode: initial_only # legacy alias for eb_cem_update_mode
+
+name: mpc_cem
