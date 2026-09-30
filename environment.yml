@@ -1,0 +1,40 @@
+name: scope_wm
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9.19
+  - pytorch=2.3.0
+  - torchvision=0.18.0
+  - pytorch-cuda=12.1
+  - numpy=1.26.4
+  - pip
+  - pip:
+      - hydra-core==1.2.0
+      - hydra-submitit-launcher==1.2.0
+      - omegaconf==2.3.0
+      - submitit==1.5.1
+      - accelerate==0.26.1
+      - gym==0.23.1
+      - d4rl==1.1
+      - mujoco==3.2.7
+      - mujoco-py==2.1.2.14
+      - decord==0.6.0
+      - einops
+      - pillow==10.3.0
+      - psutil==5.9.8
+      - pygame
+      - pymunk
+      - pyyaml==6.0.1
+      - imageio
+      - opencv-python
+      - scikit-image
+      - shapely
+      - wandb==0.13.1
+      - thop
+      - tqdm
+      - matplotlib
+      - pandas
+      - scipy

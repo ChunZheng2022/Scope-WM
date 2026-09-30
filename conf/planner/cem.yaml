@@ -1,0 +1,17 @@
+_target_: planning.cem.CEMPlanner
+horizon: 5
+topk: 30
+num_samples: 300
+var_scale: 1
+opt_steps: 30
+eval_every: 1
+
+diagnose_candidate_env: false
+diagnose_candidate_topk: 10
+diagnose_candidate_random: 0
+diagnose_candidate_eval_indices: null
+diagnose_candidate_mpc_iters: null
+diagnose_candidate_cem_iters: null
+diagnose_candidate_filename: candidate_env_diagnostics.jsonl
+
+name: cem
